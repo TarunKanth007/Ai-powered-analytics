@@ -18,6 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
+        {/* The ThemeProvider props are now correctly placed as attributes */}
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
