@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from '@/components/Header';
+import { AdvancedHeader } from '@/components/AdvancedHeader';
+import { AdvancedFooter } from '@/components/AdvancedFooter';
 import { MetricCard } from '@/components/MetricCard';
 import { AdvancedCharts } from '@/components/AdvancedCharts';
 import { TrafficChart } from '@/components/TrafficChart';
@@ -121,7 +123,7 @@ export default function Home() {
       animate="visible"
       className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800"
     >
-      <Header />
+      <AdvancedHeader />
       
       <main className="container mx-auto px-4 py-8 space-y-8">
         {/* Key Metrics */}
@@ -221,6 +223,8 @@ export default function Home() {
         {/* Data Management Component */}
         <DataManagement onDataUpdate={updateData} />
       </main>
+
+      <AdvancedFooter />
     </motion.div>
   );
 }
