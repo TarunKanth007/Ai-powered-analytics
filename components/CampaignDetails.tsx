@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { ArrowLeft, Download, Calendar, Target, Users, DollarSign, MousePointer, Eye, TrendingUp } from 'lucide-react';
 import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import 'jspdf-autotable';
 
 interface Campaign {
   id: number;
@@ -40,85 +40,93 @@ export function CampaignDetails({ campaign, onBack }: CampaignDetailsProps) {
   const [exportFormat, setExportFormat] = useState<'pdf' | 'csv'>('pdf');
 
   const exportToPDF = () => {
-    const doc = new jsPDF();
-    
-    // Header
-    doc.setFontSize(20);
-    doc.text('Campaign Performance Report', 20, 20);
-    
-    doc.setFontSize(16);
-    doc.text(campaign.name, 20, 35);
-    
-    // Campaign Overview
-    doc.setFontSize(12);
-    doc.text('Campaign Overview', 20, 55);
-    
-    const overviewData = [
-      ['Status', campaign.status],
-      ['Platform', campaign.platform],
-      ['Objective', campaign.objective],
-      ['Target Audience', campaign.targetAudience],
-      ['Start Date', new Date(campaign.startDate).toLocaleDateString()],
-      ['End Date', new Date(campaign.endDate).toLocaleDateString()],
-      ['Budget', `$${campaign.budget.toLocaleString()}`],
-      ['Spent', `$${campaign.spent.toLocaleString()}`],
-      ['Budget Utilization', `${((campaign.spent / campaign.budget) * 100).toFixed(1)}%`]
-    ];
+    try {
+      const doc = new jsPDF();
+      
+      // Header
+      doc.setFontSize(20);
+      doc.text('Campaign Performance Report', 20, 20);
+      
+      doc.setFontSize(16);
+      doc.text(campaign.name, 20, 35);
+      
+      // Campaign Overview
+      doc.setFontSize(12);
+      doc.text('Campaign Overview', 20, 55);
+      
+      const overviewData = [
+        ['Status', campaign.status],
+        ['Platform', campaign.platform],
+        ['Objective', campaign.objective],
+        ['Target Audience', campaign.targetAudience],
+        ['Start Date', new Date(campaign.startDate).toLocaleDateString()],
+        ['End Date', new Date(campaign.endDate).toLocaleDateString()],
+        ['Budget', `$${campaign.budget.toLocaleString()}`],
+        ['Spent', `$${campaign.spent.toLocaleString()}`],
+        ['Budget Utilization', `${((campaign.spent / campaign.budget) * 100).toFixed(1)}%`]
+      ];
 
-    (doc as any).autoTable({
-      startY: 65,
-      head: [['Metric', 'Value']],
-      body: overviewData,
-      theme: 'grid',
-      headStyles: { fillColor: [59, 130, 246] }
-    });
+      // Use the autoTable method properly
+      doc.autoTable({
+        startY: 65,
+        head: [['Metric', 'Value']],
+        body: overviewData,
+        theme: 'grid',
+        headStyles: { fillColor: [59, 130, 246] }
+      });
 
-    // Performance Metrics
-    doc.text('Performance Metrics', 20, (doc as any).lastAutoTable.finalY + 20);
-    
-    const metricsData = [
-      ['Impressions', campaign.impressions.toLocaleString()],
-      ['Clicks', campaign.clicks.toLocaleString()],
-      ['Conversions', campaign.conversions.toString()],
-      ['Click-Through Rate (CTR)', `${campaign.ctr}%`],
-      ['Cost Per Click (CPC)', `$${campaign.cpc}`],
-      ['Return on Ad Spend (ROAS)', `${campaign.roas}x`],
-      ['Conversion Rate', `${((campaign.conversions / campaign.clicks) * 100).toFixed(2)}%`],
-      ['Cost Per Conversion', `$${(campaign.spent / campaign.conversions).toFixed(2)}`]
-    ];
+      // Performance Metrics
+      const finalY = (doc as any).lastAutoTable.finalY;
+      doc.text('Performance Metrics', 20, finalY + 20);
+      
+      const metricsData = [
+        ['Impressions', campaign.impressions.toLocaleString()],
+        ['Clicks', campaign.clicks.toLocaleString()],
+        ['Conversions', campaign.conversions.toString()],
+        ['Click-Through Rate (CTR)', `${campaign.ctr}%`],
+        ['Cost Per Click (CPC)', `$${campaign.cpc}`],
+        ['Return on Ad Spend (ROAS)', `${campaign.roas}x`],
+        ['Conversion Rate', `${((campaign.conversions / campaign.clicks) * 100).toFixed(2)}%`],
+        ['Cost Per Conversion', `$${(campaign.spent / campaign.conversions).toFixed(2)}`]
+      ];
 
-    (doc as any).autoTable({
-      startY: (doc as any).lastAutoTable.finalY + 30,
-      head: [['Metric', 'Value']],
-      body: metricsData,
-      theme: 'grid',
-      headStyles: { fillColor: [16, 185, 129] }
-    });
+      doc.autoTable({
+        startY: finalY + 30,
+        head: [['Metric', 'Value']],
+        body: metricsData,
+        theme: 'grid',
+        headStyles: { fillColor: [16, 185, 129] }
+      });
 
-    const finalY1 = (doc as any).lastAutoTable.finalY || 120;
-    doc.setFontSize(16);
-    doc.text('Performance Metrics', 20, finalY1 + 20);
-    doc.addPage();
-    doc.text('Daily Performance Data', 20, 20);
-    
-    const dailyHeaders = ['Date', 'Impressions', 'Clicks', 'Conversions', 'Spend'];
-    const dailyRows = campaign.dailyData.map(day => [
-      new Date(day.date).toLocaleDateString(),
-      day.impressions.toLocaleString(),
-      day.clicks.toLocaleString(),
-      day.conversions.toString(),
-      `$${day.spend}`
-    ]);
+      // Add new page for daily data
+      doc.addPage();
+      doc.setFontSize(16);
+      doc.text('Daily Performance Data', 20, 20);
+      
+      const dailyHeaders = ['Date', 'Impressions', 'Clicks', 'Conversions', 'Spend'];
+      const dailyRows = campaign.dailyData.map(day => [
+        new Date(day.date).toLocaleDateString(),
+        day.impressions.toLocaleString(),
+        day.clicks.toLocaleString(),
+        day.conversions.toString(),
+        `$${day.spend}`
+      ]);
 
-    autoTable(doc, {
-      startY: finalY1 + 30,
-      head: [dailyHeaders],
-      body: dailyRows,
-      theme: 'grid',
-      headStyles: { fillColor: [139, 92, 246] }
-    });
+      if (dailyRows.length > 0) {
+        doc.autoTable({
+          startY: 30,
+          head: [dailyHeaders],
+          body: dailyRows,
+          theme: 'grid',
+          headStyles: { fillColor: [139, 92, 246] }
+        });
+      }
 
-    doc.save(`${campaign.name.replace(/\s+/g, '_')}_Report.pdf`);
+      doc.save(`${campaign.name.replace(/\s+/g, '_')}_Report.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Error generating PDF. Please try again.');
+    }
   };
 
   const exportToCSV = () => {

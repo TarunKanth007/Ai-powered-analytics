@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Trash2, Save, Upload, Database } from 'lucide-react';
 import { addUserData, clearUserData } from '@/lib/mockData';
+import { DataVisualizationPopup } from './DataVisualizationPopup';
 
 interface DataManagementProps {
   onDataUpdate: () => void;
@@ -18,6 +19,9 @@ interface DataManagementProps {
 
 export function DataManagement({ onDataUpdate }: DataManagementProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [showVisualization, setShowVisualization] = useState(false);
+  const [visualizationData, setVisualizationData] = useState<any>(null);
+  const [visualizationType, setVisualizationType] = useState<'revenue' | 'campaign'>('revenue');
   const [revenueForm, setRevenueForm] = useState({
     date: '',
     revenue: '',
@@ -47,6 +51,9 @@ export function DataManagement({ onDataUpdate }: DataManagementProps) {
       traffic: parseInt(revenueForm.traffic)
     };
     addUserData('revenue', data);
+    setVisualizationData(data);
+    setVisualizationType('revenue');
+    setShowVisualization(true);
     setRevenueForm({ date: '', revenue: '', users: '', conversions: '', orders: '', traffic: '' });
     onDataUpdate();
   };
@@ -73,6 +80,9 @@ export function DataManagement({ onDataUpdate }: DataManagementProps) {
       dailyData: []
     };
     addUserData('campaign', data);
+    setVisualizationData(data);
+    setVisualizationType('campaign');
+    setShowVisualization(true);
     setCampaignForm({
       name: '', budget: '', platform: '', objective: '',
       targetAudience: '', startDate: '', endDate: ''
@@ -82,6 +92,13 @@ export function DataManagement({ onDataUpdate }: DataManagementProps) {
 
   return (
     <>
+      <DataVisualizationPopup
+        isOpen={showVisualization}
+        onClose={() => setShowVisualization(false)}
+        data={visualizationData}
+        type={visualizationType}
+      />
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
