@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from '@/components/Header';
 import { AdvancedHeader } from '@/components/AdvancedHeader';
 import { AdvancedFooter } from '@/components/AdvancedFooter';
+import { BackgroundAnimation } from '@/components/BackgroundAnimation';
 import { MetricCard } from '@/components/MetricCard';
 import { AdvancedCharts } from '@/components/AdvancedCharts';
 import { TrafficChart } from '@/components/TrafficChart';
@@ -121,11 +122,12 @@ export default function Home() {
       variants={pageVariants}
       initial="hidden"
       animate="visible"
-      className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800"
+      className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 relative"
     >
+      <BackgroundAnimation />
       <AdvancedHeader />
       
-      <main className="container mx-auto px-4 py-8 space-y-8">
+      <main className="container mx-auto px-4 py-8 space-y-8 relative z-10">
         {/* Key Metrics */}
         <motion.div 
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"

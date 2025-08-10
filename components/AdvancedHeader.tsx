@@ -1,10 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useTheme } from './ThemeProvider';
 import { ExportButton } from './ExportButton';
+import { SearchModal } from './SearchModal';
+import { NotificationPanel } from './NotificationPanel';
 import { 
   Moon, 
   Sun, 
@@ -19,21 +22,33 @@ import {
 } from 'lucide-react';
 
 const navigationItems = [
-  { name: 'Dashboard', icon: BarChart3, href: '#dashboard' },
-  { name: 'Analytics', icon: TrendingUp, href: '#analytics' },
-  { name: 'Campaigns', icon: Users, href: '#campaigns' },
-  { name: 'Settings', icon: Settings, href: '#settings' },
+  { name: 'Dashboard', icon: BarChart3, href: '/dashboard' },
+  { name: 'Analytics', icon: TrendingUp, href: '/analytics' },
+  { name: 'Campaigns', icon: Users, href: '/campaigns' },
+  { name: 'Settings', icon: Settings, href: '/settings' },
 ];
 
 export function AdvancedHeader() {
   const { theme, setTheme } = useTheme();
+  const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
   const toggleTheme = () => {
     setTheme(theme === 'light' ? 'dark' : 'light');
   };
 
+  const handleNavigation = (href: string) => {
+    router.push(href);
+    setIsMobileMenuOpen(false);
+  };
+
   return (
+    <>
+      <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+      <NotificationPanel isOpen={isNotificationOpen} onClose={() => setIsNotificationOpen(false)} />
+      
     <motion.header
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
@@ -72,7 +87,7 @@ export function AdvancedHeader() {
             {navigationItems.map((item, index) => (
               <motion.a
                 key={item.name}
-                href={item.href}
+                onClick={() => handleNavigation(item.href)}
                 className="relative px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground transition-colors group"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -110,7 +125,12 @@ export function AdvancedHeader() {
           <div className="flex items-center space-x-2">
             {/* Search Button */}
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button variant="ghost" size="icon" className="hidden sm:flex">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="hidden sm:flex"
+                onClick={() => setIsSearchOpen(true)}
+              >
                 <Search className="h-4 w-4" />
               </Button>
             </motion.div>
@@ -121,7 +141,12 @@ export function AdvancedHeader() {
               whileHover={{ scale: 1.05 }} 
               whileTap={{ scale: 0.95 }}
             >
-              <Button variant="ghost" size="icon" className="hidden sm:flex">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="hidden sm:flex"
+                onClick={() => setIsNotificationOpen(true)}
+              >
                 <Bell className="h-4 w-4" />
               </Button>
               <motion.div
@@ -186,12 +211,11 @@ export function AdvancedHeader() {
             {navigationItems.map((item, index) => (
               <motion.a
                 key={item.name}
-                href={item.href}
+                onClick={() => handleNavigation(item.href)}
                 className="flex items-center space-x-3 px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: isMobileMenuOpen ? 1 : 0, x: isMobileMenuOpen ? 0 : -20 }}
                 transition={{ delay: index * 0.1 }}
-                onClick={() => setIsMobileMenuOpen(false)}
               >
                 <item.icon className="h-4 w-4" />
                 <span>{item.name}</span>
@@ -201,5 +225,6 @@ export function AdvancedHeader() {
         </motion.div>
       </div>
     </motion.header>
+    </>
   );
 }
